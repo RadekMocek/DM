@@ -1,0 +1,3 @@
+hvplot~=0.11.2
+pandas~=2.2.3
+pyreadstat~=1.2.8
