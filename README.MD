@@ -72,7 +72,7 @@ print("Počet sloupců:\t", meta.number_columns, "... konkrétně:", meta.column
 # Počet sloupců:    2 ... konkrétně: ['ID', 'ITEM']
 ```
 
-Z _DataFrame_ si lze pomocí `df.head(𝑛)` nechat vypsat prvních 𝑛 řádků datové matice, výpis `df.head(10)` je totožný s náhledem v Modeleru (viz první obrázek). Dále nás zajímá, jakých všech hodnot může nabývat sloupec `ITEM`, tedy jaké kategorie zboží (produktové skupiny) se v datech vyskytují. Tato informace se bude hodit i později při tvorbě pavučiňáku, proto si ji uložíme do proměnné `ITEM_TYPES`.
+Z _DataFrame_ si lze pomocí `df.head(𝑛)` nechat vypsat prvních 𝑛 řádků datové matice, výpis `df.head(10)` je totožný s náhledem v Modeleru (viz první obrázek). Dále nás zajímá, jakých všech hodnot může nabývat sloupec `ITEM`, tedy jaké kategorie zboží (produktové skupiny) se v&nbsp;datech vyskytují. Tato informace se bude hodit i později při tvorbě pavučiňáku, proto si ji uložíme do proměnné `ITEM_TYPES`.
 
 ```py
 ITEM_TYPES = df["ITEM"].unique()
@@ -91,7 +91,7 @@ df["ITEM"].value_counts().plot(kind="bar")
 
 ![Sloupcový graf vyjadřující popularitu kategorií zboží](./img/PlotBar.png)
 
-Můžeme vidět, že nejpopulárnější kategorií je `READMADE`. Těsně za `READMADE` se drží ostatní kategorie kromě čtveřice `MILK`, `TOILETRY`, `VEG` a `MEAT`; která je viditelně méně populární. Je dobré připomenout, že prozatím se zabýváme celkovým počtem prodaných kusů a nebereme v potaz kombinace zboží v&nbsp;jednotlivých košících.
+Můžeme vidět, že nejpopulárnější kategorií je `READMADE`. Těsně za `READMADE` se drží ostatní kategorie kromě čtveřice `MILK`, `TOILETRY`, `VEG` a `MEAT`; která je viditelně méně populární. Je dobré připomenout, že prozatím se zabýváme celkovým počtem prodaných kusů a nebereme v&nbsp;potaz kombinace zboží v&nbsp;jednotlivých košících.
 
 Díky knihovně _bokeh_ lze v prostředí Jupyter Notebook najet kurzorem myši na jednotlivé sloupce grafu a nechat si tak zobrazit přesnou hodnotu daného sloupce. Pro procentuální vyjádření popularity si lze upravit textový výstup funkce `value_counts`.
 
@@ -114,7 +114,7 @@ df["ITEM"].value_counts(normalize=True).mul(100).round(2).astype(str) + " %"
 
 ### Restrukturalizace dat na příznaky
 
-Pro algoritmy tvořící asociační pravidla potřebujeme transakční data převést na tzv. tabulková data, kde každý řádek reprezentuje jeden nákupní košík. Jednotlivé sloupce jsou pojmenované podle kategorií zboží a obsahují dichotomické proměnné, které vyjadřují, zdali se daná položka v daném košíku vyskytuje či nikoliv.
+Pro algoritmy tvořící asociační pravidla potřebujeme transakční data převést na tzv. tabulková data, kde každý řádek reprezentuje jeden nákupní košík. Jednotlivé sloupce jsou pojmenované podle kategorií zboží a obsahují dichotomické proměnné, které vyjadřují, zdali se daná položka v&nbsp;daném košíku vyskytuje či nikoliv.
 
 ```py
 # == Obdoba uzlu SetToFlag v SPSS Modeler ==
@@ -329,7 +329,7 @@ def recommend_alcohol(in_cart : list[str], rules : pd.DataFrame) -> bool:
 
 Tato funkce namísto boolean vrací seznam položek, které ke vstupnímu nákupu ještě doporučuje. První dva parametry jsou stejné (obsah košíku a sada pravidel), třetí parametr určuje počet výstupních doporučení.
 
-V této funkci vybereme taková pravidla, pro která platí platí, že alespoň jeden z předpokladů musí být ve zkoumaném košíku a závěr pravidla nesmí být ve zkoumaném košíku. Pokud jsou pravidla na vstupu seřazená podle confidence, stačí pak z vyhovujících pravidel získat prvních 𝑛 unikátních závěrů a ty vrátit (kde 𝑛 je třetím parametrem, tedy počet doporučení).
+V této funkci vybereme taková pravidla, pro která platí, že alespoň jeden z předpokladů musí být ve zkoumaném košíku a závěr pravidla nesmí být ve zkoumaném košíku. Pokud jsou pravidla na vstupu seřazená podle confidence, stačí pak z vyhovujících pravidel získat prvních 𝑛 unikátních závěrů a ty vrátit (kde 𝑛 je třetím parametrem, tedy počet doporučení).
 
 ```py
 def recommend_something(in_cart : list[str], rules : pd.DataFrame, n_recommendations : int) -> list[str]:
@@ -351,7 +351,7 @@ def recommend_something(in_cart : list[str], rules : pd.DataFrame, n_recommendat
 
 ## Evaluace – doporučení alkoholu
 
-Funkci pro doporučení alkoholu lze evaluovat pomocí matice sousednosti. Pro její tvorbu jsem nevyužil žádné knihovní funkce, ale postupoval jsem metodou „simple stupid“: Podívám se v historii nákupů na všechny sloupce kromě alkoholu a podle pravidel určím, zdali bych alkohol danému zákazníkovi nabídl. Pak se podívám na sloupec s alkoholem, zdali si ho tento zákazník skutečně koupil. Podle toho měřím kvalitu modelu.
+Funkci pro doporučení alkoholu lze evaluovat pomocí matice sousednosti. Pro její tvorbu jsem nevyužil žádné knihovní funkce, ale postupoval jsem metodou „simple stupid“: Podívám se v&nbsp;historii nákupů na všechny sloupce kromě alkoholu a podle pravidel určím, zdali bych alkohol danému zákazníkovi nabídl. Pak se podívám na sloupec s alkoholem, zdali si ho tento zákazník skutečně koupil. Podle toho měřím kvalitu modelu.
 
 ```py
 n_alcohol_recommended_correctly = 0        # True positive
@@ -360,7 +360,7 @@ n_alcohol_not_recommended_correctly = 0    # True negative
 n_alcohol_not_recommended_incorrectly = 0  # False negative
 
 for _, row in flags.iterrows():
-    # Row (pandas Series) bez sloupce s alkoholem je převeden na slovník stejně jako `in_my_cart_dict`
+    # Row (pandas Series) bez sloupce s alkoholem je převeden na slovník (stejně jako `in_my_cart_dict` v sekci nasazení)
     row_cart = [k for k, v in row.drop(labels=["ALCOHOL"]).to_dict().items() if v == 1]
     # Doporučíme zákazníkovi alkohol?
     recommended_alcohol = recommend_alcohol(row_cart, a_rules_alcohol)
@@ -388,12 +388,35 @@ print("     T \t", n_alcohol_not_recommended_incorrectly, "\t", n_alcohol_recomm
 #      T       109     201
 ```
 
+Ze všech 786 nákupů bychom správně 315krát nenabídli a 201krát nabídli alkohol v akci. Co se týče chyb, tak máme 161 „zbytečných nabídek“ a 109 „promarněných příležitostí“.
+
+Z hodnot matice záměn pak lze spočítat další kvantifikátory:
+
+```py
+# Zjednodušení názvů
+TP, FP, TN, FN = (n_alcohol_recommended_correctly,
+                  n_alcohol_recommended_incorrectly,
+                  n_alcohol_not_recommended_correctly,
+                  n_alcohol_not_recommended_incorrectly)
+
+print("Celkova spravnost =", (TP+TN)/(TP+FP+TN+FN))
+print("    Celkova chyba =", (FP+FN)/(TP+FP+TN+FN))
+print("         Presnost =", TP/(TP+FP))
+print("      Senzitivita =", TP/(TP+FN))
+print("     Specificnost =", TN/(TN+FP))
+# Celkova spravnost = 0.6564885496183206
+#     Celkova chyba = 0.3435114503816794
+#          Presnost = 0.5552486187845304
+#       Senzitivita = 0.6483870967741936
+#      Specificnost = 0.6617647058823529
+```
+
 ## Nasazení
 
 Nasazení simulujeme vytvořením vlastního nákupního košíku a voláním doporučovacích funkcí.
 
 ```py
-# Analogie SPSS User Input; slovník je pak převeden na list obsahující klíče, kde byla hodnota True
+# == Analogie SPSS User Input ==
 CUSTOMER_ID = 258
 in_my_cart_dict = {
     'READMADE' : 1,
@@ -408,14 +431,17 @@ in_my_cart_dict = {
     'MEAT'     : 1
 }
 
+# Slovník je převeden na list obsahující klíče, kde byla hodnota rovna jedné
 in_my_cart = [k for k, v in in_my_cart_dict.items() if v == 1]
 in_my_cart
 # ['READMADE', 'FROZEN', 'MEAT']
 
+# == Nasazení doporučení alkoholu ==
 recommend_result = recommend_alcohol(in_my_cart, a_rules_alcohol)
 print(recommend_result, "– Zakaznikovi", CUSTOMER_ID, "nabidni" if recommend_result else "nenabizej", "alkohol v akci.")
 # True – Zakaznikovi 258 nabidni alkohol v akci.
 
+# == Nasazení obecného doporučení ==
 print("Zakaznikovi", CUSTOMER_ID, "nabidni:\n", recommend_something(in_my_cart, a_rules, 3))
 # Zakaznikovi 258 nabidni:
 #  ['BAKERY', 'ALCOHOL', 'SNACKS']

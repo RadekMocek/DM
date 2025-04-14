@@ -116,6 +116,19 @@ print("     F \t", n_alcohol_not_recommended_correctly, "\t", n_alcohol_recommen
 print("     T \t", n_alcohol_not_recommended_incorrectly, "\t", n_alcohol_recommended_correctly)
 ```
 
+```py
+TP, FP, TN, FN = (n_alcohol_recommended_correctly,
+                  n_alcohol_recommended_incorrectly,
+                  n_alcohol_not_recommended_correctly,
+                  n_alcohol_not_recommended_incorrectly)
+
+print("Celkova spravnost =", (TP+TN)/(TP+FP+TN+FN))
+print("    Celkova chyba =", (FP+FN)/(TP+FP+TN+FN))
+print("         Presnost =", TP/(TP+FP))
+print("      Senzitivita =", TP/(TP+FN))
+print("     Specificnost =", TN/(TN+FP))
+```
+
 ## "User input"
 
 ```py
