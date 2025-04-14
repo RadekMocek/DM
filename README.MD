@@ -2,13 +2,13 @@
 
 ## Porozumění problému
 
-Obchodní řetězec potřebuje analyzovat nakupovací návyky svých zákazníků, aby mohl provádět cílené nabídky určitého typu zboží. Úloha má dva cíle: vytvořit akci na prodej konkrétního zboží (nabídnout či nenabídnout – v našem případě se jedná o zboží typu alkohol) a vytvořit doporučení, jaké zboží zákazníkovi ještě nabídnout.
+Obchodní řetězec potřebuje analyzovat nakupovací návyky svých zákazníků, aby mohl provádět cílené nabídky určitého typu zboží. Úloha má dva cíle: vytvořit akci na prodej konkrétního zboží (nabídnout či nenabídnout – v našem případě se jedná o zboží typu alkohol) a vytvořit obecné doporučení, jaké zboží zákazníkovi ještě nabídnout.
 
-Soubor `Shopping_items.sav` představuje transakční data vznikající při průchodu zákazníka pokladnou. Datová matice obsahuje proměnné `ID` a `ITEM`. `ID` je identifikátor jednoho konkrétního nákupu a `ITEM` je druh zboží, který byl součástí tohoto nákupu. Vstupní data jsou zjednodušena tím, že konkrétní zboží jsou již zařazeny do produktových skupin.
+Soubor `Shopping_items.sav` představuje transakční data vznikající při průchodu zákazníka pokladnou. Datová matice obsahuje proměnné `ID` a `ITEM`. `ID` je identifikátor jednoho konkrétního nákupu a `ITEM` je druh zboží, který byl součástí tohoto nákupu. Vstupní data jsou zjednodušena tím, že zboží je již zařazeno do produktových skupin.
 
 ![Náhled na vstupní data](./img/ShoppingItemsPreview.png)
 
-## Spuštění projektu
+## První spuštění projektu
 
 V kořenovém adresáři projektu otevřete PowerShell a spusťte následující příkazy:
 
@@ -28,11 +28,13 @@ jupyter notebook --notebook-dir=./notebook
 
 Po načtení uživatelského rozhraní aplikace Jupyter Notebook klikněte na soubor _alza.ipynb_.
 
+Práce ve virtuálním prostředí je alespoň na mém PC poněkud pomalejší (pomalejší instalace balíků, pomalé načítání grafů, ...). Pokud vám nevadí globální instalace balíků, pak stačí dvojice příkazů `pip install -r requirements.txt` a `jupyter notebook --notebook-dir=./notebook`.
+
 ## Import závislostí
 
 Pro realizaci zadání je použita knihovna _pandas_. Do její datové struktury zvané _DataFrame_ načteme data ze vstupního souboru `Shopping_items.sav` (balíkem _pyreadstat_) a budeme na ní provádět operace jako na datové matici v Modeleru.
 
-Pro vizualizaci dat je použita kombinace _hvplot_ + _bokeh_. Jedním z vykreslovaných grafů je tzv. pavučinový diagram (_Graphs → Web_ v Modeleru, omluvte občas používaný výraz „pavučiňák“), který ale žádná mnou zkoumaná knihovna nativně nepodporuje. Pro jeho vlastní implementaci je proto použita knihovna _networkx_.
+Pro vizualizaci dat je použita kombinace _hvplot_ + _bokeh_. Jedním z vykreslovaných grafů je tzv. pavučinový diagram (_Graphs → Web_ v Modeleru, omluvte mnou občas používaný kratší výraz „pavučiňák“), který ale žádná mnou zkoumaná knihovna nativně nepodporuje. Pro jeho vlastní implementaci je proto použita knihovna _networkx_.
 
 Modelovací algoritmus Apriori je obsažen v balíku _mlxtend_.
 
@@ -70,7 +72,7 @@ print("Počet sloupců:\t", meta.number_columns, "... konkrétně:", meta.column
 # Počet sloupců:    2 ... konkrétně: ['ID', 'ITEM']
 ```
 
-Z _DataFrame_ si lze pomocí `df.head(𝑛)` nechat vypsat prvních 𝑛 řádků datové matice, výpis `df.head(10)` je totožný s náhledem v Modeleru (viz první obrázek). Dále nás zajímá, jakých všech hodnot může nabývat sloupec `ITEM`, tedy jaké kategorie zboží se v datech vyskytují. Tato informace se bude hodit i později při tvorbě pavučiňáku, proto si ji uložíme do proměnné `ITEM_TYPES`.
+Z _DataFrame_ si lze pomocí `df.head(𝑛)` nechat vypsat prvních 𝑛 řádků datové matice, výpis `df.head(10)` je totožný s náhledem v Modeleru (viz první obrázek). Dále nás zajímá, jakých všech hodnot může nabývat sloupec `ITEM`, tedy jaké kategorie zboží (produktové skupiny) se v datech vyskytují. Tato informace se bude hodit i později při tvorbě pavučiňáku, proto si ji uložíme do proměnné `ITEM_TYPES`.
 
 ```py
 ITEM_TYPES = df["ITEM"].unique()
@@ -89,12 +91,12 @@ df["ITEM"].value_counts().plot(kind="bar")
 
 ![Sloupcový graf vyjadřující popularitu kategorií zboží](./img/PlotBar.png)
 
-Můžeme vidět, že nejpopulárnější kategorií je `READMADE`. Těsně za `READMADE` se drží ostatní kategorie kromě čtveřice `MILK`, `TOILETRY`, `VEG` a `MEAT`; která je viditelně méně populární. Je dobré připomenout, že prozatím se zabýváme celkovým počtem prodaných kusů a nebereme v potaz kombinace zboží v jednotlivých košících.
+Můžeme vidět, že nejpopulárnější kategorií je `READMADE`. Těsně za `READMADE` se drží ostatní kategorie kromě čtveřice `MILK`, `TOILETRY`, `VEG` a `MEAT`; která je viditelně méně populární. Je dobré připomenout, že prozatím se zabýváme celkovým počtem prodaných kusů a nebereme v potaz kombinace zboží v&nbsp;jednotlivých košících.
 
 Díky knihovně _bokeh_ lze v prostředí Jupyter Notebook najet kurzorem myši na jednotlivé sloupce grafu a nechat si tak zobrazit přesnou hodnotu daného sloupce. Pro procentuální vyjádření popularity si lze upravit textový výstup funkce `value_counts`.
 
 ```py
-# normalize=True převede na rozsah 0–1, vynásobit, zaokrouhlit, přidat "%" ...
+# `normalize=True` převede na rozsah 0–1, pak vynásobit stem, zaokrouhlit a přidat " %"
 df["ITEM"].value_counts(normalize=True).mul(100).round(2).astype(str) + " %"
 # READMADE    16.16 %
 # SNACKS      15.57 %
@@ -118,7 +120,7 @@ Pro algoritmy tvořící asociační pravidla potřebujeme transakční data př
 # == Obdoba uzlu SetToFlag v SPSS Modeler ==
 # get_dummies převádí kategoriální data na příznaková
 # parametry: chceme převést DataFrame df, v něm sloupec "ITEM", u vzniklých sloupců nepřidávat žádný prefix
-# seskupujeme podle sloupce "ID" (jeden nákup/zákazník), po groupby musí přijít agregační funkce – suma nám udělá jedničky a nuly
+# seskupujeme podle sloupce "ID" (jeden nákup), po groupby musí přijít agregační funkce – suma nám udělá jedničky a nuly
 flags = pd.get_dummies(df, columns=["ITEM"], prefix="", prefix_sep="").groupby(["ID"]).sum()
 flags
 ```
@@ -132,7 +134,7 @@ ID|ALCOHOL|BAKERY|FROZEN|MEAT|MILK|READMADE|SNACKS|TINNED|TOILETRY|VEG
 5.0|0|0|0|0|0|1|0|0|0|0
 ...|...|...|...|...|...|...|...|...|...|...
 
-Pro splnění prvního zadání se nám bude hodit množinu všech nákupních košů, které obsahují alkohol, proto si ji uložíme do proměnné `flags_alcohol`.
+Pro splnění prvního zadání se nám bude hodit množina všech nákupních košů, které obsahují alkohol, a proto si ji uložíme do proměnné `flags_alcohol`.
 
 ```py
 flags_alcohol = flags[flags["ALCOHOL"] == 1]
@@ -140,7 +142,7 @@ flags_alcohol = flags[flags["ALCOHOL"] == 1]
 
 ### Pavučinový diagram
 
-Pro vykreslení tabulkových dat, které vyjadřují společné typy zboží v rámci nákupního košíku, je možné použít pavučinový diagram. Jelikož jsem nenašel žádnou knihovnu, která by tento typ grafu nativně podporovala, tak ho vykresluji „ručně“. Jedná se o obecný graf z balíku _networkx_, kde definuji uzly (jejich souřadnice a popisky) a hrany (mezi kterými uzly vedou? jaké mají ohodnocení?). Pro eliminaci opakujícícho se kódu byla definována podpůrná funkce.
+Pro vykreslení tabulkových dat, které vyjadřují společné typy zboží v rámci nákupního košíku, je možné použít pavučinový diagram. Jelikož jsem nenašel žádnou knihovnu, která by tento typ grafu nativně podporovala, tak ho vykresluji „ručně“. Jedná se o obecný graf z balíku _networkx_, kde definuji uzly (jejich souřadnice a popisky) a hrany (mezi kterými uzly vedou? jaké mají ohodnocení?). Pro eliminaci opakujícího se kódu byla definována podpůrná funkce.
 
 ```py
 def web(nodes, edges, edge_colors):
@@ -199,7 +201,7 @@ n_alcohol_connections
 # 1014
 ```
 
-Nákupů obsahujících alkohol je 310, to odečteme od celkového počtu nakoupených položek a dostáváme 1014. Jedná se o počet položek, které se v libovolném košíku vyskytly společně s alkoholem. Tímto číslem budeme dělit, abychom hrany pavučiňáku mohli vyjádřit procentuelně. Pro podpůrnou funkci je třeba popsat hrany a jejich barvy (ohodnocení).
+Nákupů obsahujících alkohol je 310, to odečteme od celkového počtu všech nakoupených položek a dostáváme 1014. Jedná se o počet položek, které se v libovolném košíku vyskytly společně s alkoholem. Tímto číslem budeme dělit, abychom hrany pavučiňáku mohli vyjádřit procentuelně. Pro podpůrnou funkci je třeba popsat hrany a jejich barvy (ohodnocení).
 
 ```py
 # Vedeme hranu z alkoholu do všeho, co není alkohol.
@@ -303,17 +305,55 @@ a_rules_alcohol
 
 ![7 Apriori pravidel se závěrem `ALCOHOL`](./img/AprioriRules2.png)
 
-Nyní tedy máme vygenerovaná pravidla s `MINIMUM_ANTECEDENT_SUPPORT` a `MINIMUM_RULE_CONFIDENCE` pro doporučení alkoholu v akci a pro obecné doporučení dalšího typu zboží, které můžeme nasadit.
+Nyní tedy máme vygenerovaná pravidla s `MINIMUM_ANTECEDENT_SUPPORT` a `MINIMUM_RULE_CONFIDENCE` pro doporučení alkoholu v akci a pro obecné doporučení dalšího typu zboží. Z těchto pravidel nyní vytvoříme doporučovací Python funkce, které budeme moct evaluovat a nasadit.
 
-## Nasazení
+### Doporučovací funkce
+
+#### Doporučovací funkce pro alkohol
+
+Pokud je zkoumaný nákup nadmnožinou nějaké množiny předpokladů pravidel, které mají jako závěr alkohol, a zároveň zkoumaný nákup alkohol ještě neobsahuje, pak alkohol nabídneme. Funkce si bere jako parametry obsah košíku (kolekce řetězců) a seznam pravidel ve formě _DataFrame_. Funkce vrací boolean True/False – doporučit/nedoporučit.
+
+```py
+def recommend_alcohol(in_cart : list[str], rules : pd.DataFrame) -> bool:
+    in_cart_set = set(in_cart)
+    if "ALCOHOL" in in_cart_set:
+        return False
+    for _, row in rules.iterrows():
+        # Na množiny lze používat operátory <, >, <=, >= pro kontrolu podmnožin/nadmnožin
+        if in_cart_set >= set(row["antecedents"]):
+            return True
+    return False
+```
+
+#### Všeobecná doporučovací funkce
+
+Tato funkce namísto boolean vrací seznam položek, které ke vstupnímu nákupu ještě doporučuje. První dva parametry jsou stejné (obsah košíku a sada pravidel), třetí parametr určuje počet výstupních doporučení.
+
+V této funkci vybereme taková pravidla, pro která platí platí, že alespoň jeden z předpokladů musí být ve zkoumaném košíku a závěr pravidla nesmí být ve zkoumaném košíku. Pokud jsou pravidla na vstupu seřazená podle confidence, stačí pak z vyhovujících pravidel získat prvních 𝑛 unikátních závěrů a ty vrátit (kde 𝑛 je třetím parametrem, tedy počet doporučení).
+
+```py
+def recommend_something(in_cart : list[str], rules : pd.DataFrame, n_recommendations : int) -> list[str]:
+    """
+    [!] Počítáme s tím, že pravidla už jsou seřazená podle confidence
+    """
+    recommendations = (rules[
+        (rules["antecedents"].apply(lambda antecedents: any(product in antecedents for product in in_cart)))
+        &
+        (rules["consequents"].apply(lambda consequents: not any(product in consequents for product in in_cart)))
+    ])
+    result = []
+    for _, row in recommendations.iterrows():
+        for item in row["consequents"]:
+            if item not in result:
+                result.append(item)
+    return result[:n_recommendations]
+```
 
 ## Evaluace – doporučení alkoholu
 
-```py
-# Podívám se v historii nákupů na všechny sloupce kromě alkoholu a podle pravidel určím, zdali bych alkohol
-# danému zákazníkovi nabídl. Pak se podívám na sloupec s alkoholem, zdali si ho tento zákazník skutečně koupil.
-# Podle toho měřím kvalitu modelu.
+Funkci pro doporučení alkoholu lze evaluovat pomocí matice sousednosti. Pro její tvorbu jsem nevyužil žádné knihovní funkce, ale postupoval jsem metodou „simple stupid“: Podívám se v historii nákupů na všechny sloupce kromě alkoholu a podle pravidel určím, zdali bych alkohol danému zákazníkovi nabídl. Pak se podívám na sloupec s alkoholem, zdali si ho tento zákazník skutečně koupil. Podle toho měřím kvalitu modelu.
 
+```py
 n_alcohol_recommended_correctly = 0        # True positive
 n_alcohol_recommended_incorrectly = 0      # False positive
 n_alcohol_not_recommended_correctly = 0    # True negative
@@ -346,4 +386,37 @@ print("     T \t", n_alcohol_not_recommended_incorrectly, "\t", n_alcohol_recomm
 # Alcohol       F       T
 #      F       315     161
 #      T       109     201
+```
+
+## Nasazení
+
+Nasazení simulujeme vytvořením vlastního nákupního košíku a voláním doporučovacích funkcí.
+
+```py
+# Analogie SPSS User Input; slovník je pak převeden na list obsahující klíče, kde byla hodnota True
+CUSTOMER_ID = 258
+in_my_cart_dict = {
+    'READMADE' : 1,
+    'SNACKS'   : 0,
+    'TOILETRY' : 0,
+    'MILK'     : 0,
+    'BAKERY'   : 0,
+    'TINNED'   : 0,
+    'FROZEN'   : 1,
+    'ALCOHOL'  : 0,
+    'VEG'      : 0,
+    'MEAT'     : 1
+}
+
+in_my_cart = [k for k, v in in_my_cart_dict.items() if v == 1]
+in_my_cart
+# ['READMADE', 'FROZEN', 'MEAT']
+
+recommend_result = recommend_alcohol(in_my_cart, a_rules_alcohol)
+print(recommend_result, "– Zakaznikovi", CUSTOMER_ID, "nabidni" if recommend_result else "nenabizej", "alkohol v akci.")
+# True – Zakaznikovi 258 nabidni alkohol v akci.
+
+print("Zakaznikovi", CUSTOMER_ID, "nabidni:\n", recommend_something(in_my_cart, a_rules, 3))
+# Zakaznikovi 258 nabidni:
+#  ['BAKERY', 'ALCOHOL', 'SNACKS']
 ```

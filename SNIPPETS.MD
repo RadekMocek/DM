@@ -1,5 +1,21 @@
 # CtlrC CtlrV
 
+## První spuštění
+
+```ps1
+# 1. Vytvoření virtuálního prostředí
+py -m venv .venv
+
+# 2. Aktivace virtuálního prostředí
+.venv\Scripts\activate
+
+# 3. Nainstalování potřebných závislostí
+py -m pip install -r requirements.txt
+
+# 4. Spuštění aplikace Jupyter Notebook v adresáři s notebookem
+jupyter notebook --notebook-dir=./notebook
+```
+
 ## Importy a načtení .sav
 
 ```py
@@ -70,10 +86,6 @@ nodes, labels, edges = web(ITEM_TYPES, edges, edge_colors)
 ## Evaluace – matice záměn doporučení alkoholu
 
 ```py
-# Podívám se v historii nákupů na všechny sloupce kromě alkoholu a podle pravidel určím, zdali bych alkohol
-# danému zákazníkovi nabídl. Pak se podívám na sloupec s alkoholem, zdali si ho tento zákazník skutečně koupil.
-# Podle toho měřím kvalitu modelu.
-
 n_alcohol_recommended_correctly = 0        # True positive
 n_alcohol_recommended_incorrectly = 0      # False positive
 n_alcohol_not_recommended_correctly = 0    # True negative
@@ -102,4 +114,23 @@ for _, row in flags.iterrows():
 print("Alcohol\t  F\t  T")
 print("     F \t", n_alcohol_not_recommended_correctly, "\t", n_alcohol_recommended_incorrectly)
 print("     T \t", n_alcohol_not_recommended_incorrectly, "\t", n_alcohol_recommended_correctly)
+```
+
+## "User input"
+
+```py
+in_my_cart_dict = {
+    'READMADE' : 0,
+    'SNACKS'   : 0,
+    'TOILETRY' : 0,
+    'MILK'     : 0,
+    'BAKERY'   : 0,
+    'TINNED'   : 0,
+    'FROZEN'   : 0,
+    'ALCOHOL'  : 0,
+    'VEG'      : 0,
+    'MEAT'     : 0
+}
+
+in_my_cart = [k for k, v in in_my_cart_dict.items() if v == 1]
 ```
