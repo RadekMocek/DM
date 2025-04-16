@@ -53,7 +53,7 @@ pd.options.plotting.backend = "hvplot"  # Namísto matplotlib používáme hvplo
 
 ## Porozumění datům
 
-Transakční data je nejrpve nutné načíst, k tomu použijeme balík _pyreadstat_. Než se vrhneme na samotnou datovou matici v podobě _pandas DataFrame_, můžeme vyčíst z metadat, že máme na vstupu 2395 řádků a dva sloupce: `ID` a `ITEM`.
+Transakční data je nejprve nutné načíst, k tomu použijeme balík _pyreadstat_. Než se vrhneme na samotnou datovou matici v podobě _pandas DataFrame_, můžeme vyčíst z metadat, že máme na vstupu 2395 řádků a dva sloupce: `ID` a `ITEM`.
 
 ```py
 # == Nalezení a načtení SPSS dat. Dostáváme pandas DataFrame a metadata. ==
