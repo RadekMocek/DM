@@ -1,5 +1,7 @@
 # CtlrC CtlrV
 
+__Pokud bude tlačit čas, začneme krást přímo z [alza.ipynb](./notebook/alza.ipynb).__
+
 ## První spuštění
 
 ```ps1
@@ -14,6 +16,13 @@ py -m pip install -r requirements.txt
 
 # 4. Spuštění aplikace Jupyter Notebook v adresáři s notebookem
 jupyter notebook --notebook-dir=./notebook
+```
+
+## Google Colab missing packages
+
+```bash
+!pip install hvplot
+!pip install pyreadstat
 ```
 
 ## Importy a načtení .sav
@@ -32,8 +41,15 @@ from mlxtend.frequent_patterns import apriori, association_rules
 pd.options.plotting.backend = "hvplot"  # Namísto matplotlib používáme hvplot + bokeh
 
 # == Nalezení a načtení SPSS dat. Dostáváme pandas DataFrame a metadata. ==
+# Colab:
+#from google.colab import files
+#uploaded = files.upload()
+#PATH_SHOPPING_ITEMS = list(uploaded.keys())[0]
+
+# Local:
 PATH = pathlib.Path()
 PATH_SHOPPING_ITEMS = PATH / ".." / "data" / "Shopping_items.sav"
+
 df, meta = pyreadstat.read_sav(PATH_SHOPPING_ITEMS)
 print(type(df))
 # <class 'pandas.core.frame.DataFrame'>
