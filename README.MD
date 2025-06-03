@@ -39,6 +39,11 @@ Pro vizualizaci dat je použita kombinace _hvplot_ + _bokeh_. Jedním z vykreslo
 Modelovací algoritmus Apriori je obsažen v balíku _mlxtend_.
 
 ```py
+# --- Pouze Google Colab
+#!pip install hvplot
+#!pip install pyreadstat
+# ---
+
 import itertools  # Vytvoření kombinací, pomůže při tvorbě pavučiňáku
 import pathlib    # K souboru .sav se dostaneme relativní cestou
 
@@ -57,8 +62,14 @@ Transakční data je nejprve nutné načíst, k tomu použijeme balík _pyreadst
 
 ```py
 # == Nalezení a načtení SPSS dat. Dostáváme pandas DataFrame a metadata. ==
+# --- Pouze Google Colab
+#from google.colab import files
+#uploaded = files.upload()
+#PATH_SHOPPING_ITEMS = list(uploaded.keys())[0]
+# --- Pouze Local
 PATH = pathlib.Path()
 PATH_SHOPPING_ITEMS = PATH / ".." / "data" / "Shopping_items.sav"
+# ---
 df, meta = pyreadstat.read_sav(PATH_SHOPPING_ITEMS)
 print(type(df))
 # <class 'pandas.core.frame.DataFrame'>
